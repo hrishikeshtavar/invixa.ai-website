@@ -1,6 +1,13 @@
 import React from 'react';
+import { useForm, ValidationError } from '@formspree/react';
 
 export default function InvixaLandingPage() {
+  const [isModalOpen, setIsModalOpen] = React.useState(false);
+  
+  // Formspree forms
+  const [demoState, handleDemoSubmit] = useForm('xkoyanko');
+  const [waitlistState, handleWaitlistSubmit] = useForm('xkoyanko');
+
   return (
     <div className="min-h-screen bg-[#f5f7fb] text-slate-900">
       <style>{`
@@ -115,13 +122,10 @@ export default function InvixaLandingPage() {
               </p>
 
               <div className="mt-10 flex flex-col gap-4 sm:flex-row">
-                <button className="rounded-2xl bg-blue-600 px-7 py-4 font-semibold text-white shadow-lg shadow-blue-600/20 transition hover:-translate-y-0.5 hover:bg-blue-500">
+                <button onClick={() => setIsModalOpen(true)} className="rounded-2xl bg-blue-600 px-7 py-4 font-semibold text-white shadow-lg shadow-blue-600/20 transition hover:-translate-y-0.5 hover:bg-blue-500">
                   Book a Demo
                 </button>
 
-                <button className="rounded-2xl border border-slate-300 bg-white px-7 py-4 font-semibold text-slate-700 transition hover:border-slate-400 hover:bg-slate-50">
-                  See how it works
-                </button>
               </div>
 
               <div className="mt-12 grid max-w-2xl grid-cols-1 gap-4 sm:grid-cols-3">
@@ -291,17 +295,25 @@ export default function InvixaLandingPage() {
               Invixa.ai is opening early access for UK SME owners, finance teams, and business users who want a simpler way to spot fraud.
             </p>
 
-            <div className="mt-10 flex flex-col justify-center gap-4 sm:flex-row">
+            <form onSubmit={handleWaitlistSubmit} className="mt-10 flex flex-col justify-center gap-4 sm:flex-row">
               <input
                 type="email"
+                name="waitlist_email"
                 placeholder="Enter your work email"
+                required
                 className="min-w-[280px] rounded-2xl border border-white/10 bg-white px-6 py-4 text-slate-900 outline-none transition placeholder:text-slate-400 focus:border-blue-400 sm:min-w-[340px]"
               />
 
-              <button className="rounded-2xl bg-blue-500 px-8 py-4 font-semibold text-white transition hover:bg-blue-400">
-                Join Waitlist
+              <button type="submit" className="rounded-2xl bg-blue-500 px-8 py-4 font-semibold text-white transition hover:bg-blue-400 disabled:opacity-50" disabled={waitlistState.submitting}>
+                {waitlistState.submitting ? 'Sending...' : 'Join Waitlist'}
               </button>
-            </div>
+            </form>
+            {waitlistState.succeeded && (
+              <p className="mt-4 text-center text-sm font-medium text-emerald-600">✓ Thank you! We'll be in touch soon.</p>
+            )}
+            {waitlistState.errors && waitlistState.errors.length > 0 && (
+              <p className="mt-4 text-center text-sm font-medium text-rose-600">Error submitting. Please try again.</p>
+            )}
           </div>
         </div>
       </section>
@@ -317,6 +329,87 @@ export default function InvixaLandingPage() {
           </div>
         </div>
       </footer>
+
+      {isModalOpen && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 p-4 backdrop-blur-sm">
+          <div className="w-full max-w-md rounded-3xl bg-white p-8 shadow-2xl">
+            <h3 className="text-2xl font-bold text-slate-900">Book a Demo</h3>
+            <p className="mt-2 text-slate-600">Tell us about your business and we'll show you how Invixa.ai can help.</p>
+
+            <form onSubmit={handleDemoSubmit} className="mt-6 space-y-4">
+              <div>
+                <label className="block text-sm font-semibold text-slate-700 mb-2">Full Name</label>
+                <input
+                  type="text"
+                  name="full_name"
+                  placeholder="Your name"
+                  required
+                  className="w-full rounded-xl border border-slate-200 bg-slate-50 px-4 py-3 text-slate-900 outline-none transition placeholder:text-slate-400 focus:border-blue-400 focus:bg-white"
+                />
+                <ValidationError field="full_name" errors={demoState.errors} />
+              </div>
+
+              <div>
+                <label className="block text-sm font-semibold text-slate-700 mb-2">Company Name</label>
+                <input
+                  type="text"
+                  name="company_name"
+                  placeholder="Your company"
+                  required
+                  className="w-full rounded-xl border border-slate-200 bg-slate-50 px-4 py-3 text-slate-900 outline-none transition placeholder:text-slate-400 focus:border-blue-400 focus:bg-white"
+                />
+                <ValidationError field="company_name" errors={demoState.errors} />
+              </div>
+
+              <div>
+                <label className="block text-sm font-semibold text-slate-700 mb-2">Email</label>
+                <input
+                  type="email"
+                  name="email"
+                  placeholder="your@email.com"
+                  required
+                  className="w-full rounded-xl border border-slate-200 bg-slate-50 px-4 py-3 text-slate-900 outline-none transition placeholder:text-slate-400 focus:border-blue-400 focus:bg-white"
+                />
+                <ValidationError field="email" errors={demoState.errors} />
+              </div>
+
+              {demoState.succeeded && (
+                <p className="text-sm font-medium text-emerald-600">✓ Demo request sent! We'll contact you soon.</p>
+              )}
+
+              <div className="flex gap-3 pt-2">
+                <button
+                  type="button"
+                  onClick={() => {
+                    setIsModalOpen(false);
+                  }}
+                  className="flex-1 rounded-xl border border-slate-300 py-3 font-semibold text-slate-700 transition hover:bg-slate-50"
+                >
+                  Cancel
+                </button>
+                <button
+                  type="submit"
+                  disabled={demoState.submitting}
+                  className="flex-1 rounded-xl bg-blue-600 py-3 font-semibold text-white transition hover:bg-blue-500 disabled:opacity-50"
+                >
+                  {demoState.submitting ? 'Sending...' : 'Send Request'}
+                </button>
+              </div>
+            </form>
+
+            {demoState.succeeded && (
+              <div className="mt-4 text-center">
+                <button
+                  onClick={() => setIsModalOpen(false)}
+                  className="text-sm text-slate-600 hover:text-slate-900 transition"
+                >
+                  Close
+                </button>
+              </div>
+            )}
+          </div>
+        </div>
+      )}
     </div>
   )
 }

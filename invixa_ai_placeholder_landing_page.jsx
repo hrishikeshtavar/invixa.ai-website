@@ -95,7 +95,7 @@ export default function InvixaLandingPage() {
             <a href="#contact" className="transition hover:text-slate-900">Contact</a>
           </nav>
 
-          <button className="rounded-full bg-blue-600 px-5 py-2.5 font-semibold text-white shadow-lg shadow-blue-600/20 transition hover:-translate-y-0.5 hover:bg-blue-500">
+          <button onClick={() => setIsModalOpen(true)} className="rounded-full bg-blue-600 px-5 py-2.5 font-semibold text-white shadow-lg shadow-blue-600/20 transition hover:-translate-y-0.5 hover:bg-blue-500">
             Request Demo
           </button>
         </div>
